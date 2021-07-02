@@ -1,0 +1,23 @@
+{
+  "name": "notification_system",
+  "version": "1.0.0",
+  "description": "Notification system to improve driver quality. It supplies drivers' ride  completion rate.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ride-sharing",
+    "notification",
+    "rider-info",
+    "completion-rate"
+  ],
+  "author": "noiem, sakib",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5",
+    "nodemon": "^2.0.9"
+  }
+}

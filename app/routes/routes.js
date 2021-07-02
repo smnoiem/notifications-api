@@ -9,7 +9,18 @@ router.get('/completion-rate/:supply_id', (req, res) => {
 
   const driverId = req.params.supply_id;
   
-  let currDT = new Date();
+  let lastDay = new Date( Date.now() - 86400000);
+  
+  let lastDayBeginning = lastDay.toISOString().slice(0, 10);
+
+  driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
+    if(err) res.send(err);
+    else{
+      res.send(result);
+    }
+  } );
+
+  /*
   let lastDayBeginning = Date.now();
 
   let timePassedInTheDay = ( 
@@ -19,20 +30,15 @@ router.get('/completion-rate/:supply_id', (req, res) => {
     + currDT.getMilliseconds()
   );
 
-  lastDayBeginning = timePassedInTheDay - 86400000;
-  
-  driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
-    //console.log('alright here');
-    if(err) res.send(err);
-    else{
-      res.send(result);
-    }
-  } );
-
-  /*
-  let prevDO = new Date(lastDay);
-  console.log( 'date', prevDO.getDate(), 'month', prevDO.getMonth() , 'h', prevDO.getHours(), 'm', prevDO.getMinutes(), 's', prevDO.getSeconds() );
+  lastDayBeginning = lastDayBeginning - timePassedInTheDay - 86400000;
   */
+
+  //let tmp = new Date(lastDayBeginning);
+/*
+  let prevDO = new Date(lastDayBeginning);
+  console.log( 'date', prevDO.getDate(), 'month', prevDO.getMonth() , 'h', prevDO.getHours(), 'm', prevDO.getMinutes(), 's', prevDO.getSeconds() );
+*/
+
 
   //res.send( {"info": "this is your info"} );
 

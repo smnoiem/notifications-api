@@ -16,10 +16,12 @@ class driverModel {
       .catch(err => cb(err, null))
   }
   
-  static completionRate = (driverId, lastDayBegining, cb) => {
+  static completionRate = (driverId, lastDayBeginning, cb) => {
+    console.log(lastDayBeginning);
     const sqlQ = 
-      "SELECT status, count(status) AS occurrence FROM orders WHERE (driver_id = ? AND timestamp>= ?) GROUP BY status ORDER BY timestamp DESC LIMIT 100" ;
-    db.execute(sqlQ, [driverId, lastDayBegining])
+      "SELECT status, count(status) AS occurrence FROM orders WHERE (driver_id = ? AND timestamp>= ? ) GROUP BY status ORDER BY timestamp DESC LIMIT 100" ;
+    
+    db.execute(sqlQ, [driverId, lastDayBeginning])
       .then(result => cb(null, result[0]))
       .catch(err => cb(err, null))
   }

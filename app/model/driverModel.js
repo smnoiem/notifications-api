@@ -15,6 +15,14 @@ class driverModel {
       .then(result => cb(null, result[0]))
       .catch(err => cb(err, null))
   }
+  
+  static completionRate = (driverId, lastDayBegining, cb) => {
+    const sqlQ = 
+      "SELECT status, count(status) AS occurrence FROM orders WHERE (driver_id = ? AND timestamp>= ?) GROUP BY status ORDER BY timestamp DESC LIMIT 100" ;
+    db.execute(sqlQ, [driverId, lastDayBegining])
+      .then(result => cb(null, result[0]))
+      .catch(err => cb(err, null))
+  }
 
   static create = (userInfo, cb) => {
     const {nid_number, name, phone, vehicle_id} = userInfo;

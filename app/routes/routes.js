@@ -6,8 +6,36 @@ const driverModel = require('../model/driverModel');
 const router = express.Router();
 
 router.get('/completion-rate/:supply_id', (req, res) => {
+
   const driverId = req.params.supply_id;
-  res.send( {"info": "this is your info"} );
+  
+  let currDT = new Date();
+  let lastDayBeginning = Date.now();
+
+  let timePassedInTheDay = ( 
+    currDT.getHours()*3600000 
+    + currDT.getMinutes()*60000 
+    + currDT.getSeconds() * 1000
+    + currDT.getMilliseconds()
+  );
+
+  lastDayBeginning = timePassedInTheDay - 86400000;
+  
+  driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
+    //console.log('alright here');
+    if(err) res.send(err);
+    else{
+      res.send(result);
+    }
+  } );
+
+  /*
+  let prevDO = new Date(lastDay);
+  console.log( 'date', prevDO.getDate(), 'month', prevDO.getMonth() , 'h', prevDO.getHours(), 'm', prevDO.getMinutes(), 's', prevDO.getSeconds() );
+  */
+
+  //res.send( {"info": "this is your info"} );
+
 });
 
 router.post('/create', (req, res) => {

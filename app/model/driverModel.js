@@ -17,7 +17,7 @@ class driverModel {
   }
   
   static completionRate = (driverId, lastDayBeginning, cb) => {
-    console.log(lastDayBeginning);
+    //console.log(lastDayBeginning);
     const sqlQ = 
       "SELECT status, count(status) AS occurrence FROM orders WHERE (driver_id = ? AND timestamp>= ? ) GROUP BY status ORDER BY timestamp DESC LIMIT 100" ;
     

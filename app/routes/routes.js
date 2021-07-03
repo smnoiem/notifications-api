@@ -1,7 +1,7 @@
 
 const express = require('express');
 const driverModel = require('../model/driverModel');
-//const driverModel = require('../model/driverModel');
+const messages = require('../notification/message');
 
 const router = express.Router();
 
@@ -16,7 +16,26 @@ router.get('/completion-rate/:supply_id', (req, res) => {
   driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
     if(err) res.send(err);
     else{
-      res.send(result);
+      //res.send(result);
+      let completed = 0;
+      let cancelled = 0;
+      for(let data of result){
+        setTimeout( () => {
+        if(data.status == 'COMPLETED') completed = data.occurrence;
+        if(data.status == 'CANCELLED') cancelled = data.occurrence;
+        }, 3000);
+      }
+      //console.log('here ', completed, cancelled);
+      let rate = 0.85;
+      if(completed+cancelled == 100 ) {
+        rate = completed/100.0;
+      }
+      messages.getMessage(rate, (msg) => {
+        res.send({
+          "Completion_rate": rate,
+          "Message": msg
+          });
+      });
     }
   } );
 

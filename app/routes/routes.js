@@ -9,10 +9,12 @@ router.get('/completion-rate/:supply_id', (req, res) => {
   const driverId = req.params.supply_id;
 
   //validating driver id
-  driverModel.getDriverById( driverId, (err, result) => {
-    if(err) res.send({"Error" : "something happened in db query", "error_code" : err.errno });
+  driverModel.getDriverById( driverId, (errInGetDriver, resultInGetDriver) => {
+    if(errInGetDriver) {
+      res.send( {"Error" : "something happened in db query111!", "error_code" : errInGetDriver.errno });
+    }
     else {
-      if(result.length) {
+      if(resultInGetDriver.length > 0) {
 
         //
         //fetching driver completion data
@@ -21,33 +23,69 @@ router.get('/completion-rate/:supply_id', (req, res) => {
         
         let lastDayBeginning = lastDay.toISOString().slice(0, 10);
 
-        driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
-          if(err) res.send(err);
-          else if(result.length == 0) res.send('no data found');
+        driverModel.getTotalOrder(driverId, (errInTotal, resultInTotal) => {
+          if(errInTotal) res.send({"Error" : "Error fetching total order", "error_code" : errInTotal.errno});
           else{
-            //res.send(result);
-            //return;
-            let completed = 0;
-            let cancelled = 0;
-            for(let data of result){
-              if(data.status == 'COMPLETED') completed = data.occurrence;
-              if(data.status == 'CANCELLED') cancelled = data.occurrence;
-            }
-            console.log('here ', completed, cancelled);
-            let rate = 0.85;
-            if(completed+cancelled >= 100 ) {
-              rate = completed/100.0;
-            }
-            messages.getMessage(rate, (msg) => {
-              res.send({
-                "Completion_rate": rate,
-                "Message": msg
+            const totalOrderAssigned = resultInTotal;
+            //res.send( totalOrderAssigned );
+
+            //
+            // completion rate counting starts
+
+            driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
+              if(err) res.send( {"Error":"something went wrong while fetching completion rate", "error_code": err.errno } );
+              else{
+                //res.send(result);
+                //return;
+                let completed = 0;
+                let cancelled = 0;
+                for(let data of result){
+                  if(data.status == 'COMPLETED') completed = data.occurrence;
+                  if(data.status == 'CANCELLED') cancelled = data.occurrence;
+                }
+                console.log('here ', completed, cancelled);
+                let rate = 0.85;
+                if( totalOrderAssigned >= 100 ) {
+                  rate = completed/100.0;
+                }
+                messages.getMessage(rate, (msg) => {
+                  res.send({
+                    "Completion_rate": rate,
+                    "Message": msg
+                    });
                 });
+              }
             });
+            //
+            // driver's ride completion data fetching ends
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
           }
-        })
-        //
-        // driver's ride completion data fetching ends
+        });
+
+        
+
+
+
+
+
+
+
+
+
+        
 
       }
       else res.send({"Error": "Invalid driver id"});

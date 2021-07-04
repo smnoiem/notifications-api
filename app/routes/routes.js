@@ -15,19 +15,19 @@ router.get('/completion-rate/:supply_id', (req, res) => {
 
   driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
     if(err) res.send(err);
+    else if(result.length == 0) res.send('no data found');
     else{
       //res.send(result);
+      //return;
       let completed = 0;
       let cancelled = 0;
       for(let data of result){
-        setTimeout( () => {
         if(data.status == 'COMPLETED') completed = data.occurrence;
         if(data.status == 'CANCELLED') cancelled = data.occurrence;
-        }, 3000);
       }
-      //console.log('here ', completed, cancelled);
+      console.log('here ', completed, cancelled);
       let rate = 0.85;
-      if(completed+cancelled == 100 ) {
+      if(completed+cancelled >= 100 ) {
         rate = completed/100.0;
       }
       messages.getMessage(rate, (msg) => {

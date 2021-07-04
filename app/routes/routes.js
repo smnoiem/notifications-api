@@ -107,6 +107,7 @@ router.get('/completion-rate/:supply_id', (req, res) => {
     .catch( err =>  res.send(err) );
 });
 
+
 router.post('/create', (req, res) => {
 
   if(!req.body) {
@@ -114,7 +115,6 @@ router.post('/create', (req, res) => {
     return;
   }
   const {nid_number, name, phone, vehicle_id} = req.body;
-  const sqlQ = "INSERT INTO drivers VALUES (?,?,?,?) ";
 
   //validation
   if(nid_number && name && phone && vehicle_id){
@@ -155,7 +155,27 @@ router.get('/drivers/by_phone/:driverPhone', (req, res) => {
     if(err) res.send({"message" : "driver not found", "error_code" : err.errno });
     else {
       if(result.length) res.send(result);
-      else res.send({"Error": "invalid driver id"});
+      else res.send({"Error": "No driver is registered with this phone number."});
+    }
+  });
+});
+
+router.get('/drivers/by_nid/:nid', (req, res) => {
+  driverModel.getDriverByNid( req.params.nid, (err, result) => {
+    if(err) res.send({"message" : "driver not found", "error_code" : err.errno });
+    else {
+      if(result.length) res.send(result);
+      else res.send({"Error": "No driver is registered with this NID"});
+    }
+  });
+});
+
+router.get('/drivers/by_vehicle/:vehicleId', (req, res) => {
+  driverModel.getDriverByVehicleId( req.params.vehicleId, (err, result) => {
+    if(err) res.send({"message" : "driver not found", "error_code" : err.errno });
+    else {
+      if(result.length) res.send(result);
+      else res.send({"Error": "No driver is registered with this vehicle"});
     }
   });
 });

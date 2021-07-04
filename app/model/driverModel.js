@@ -10,7 +10,6 @@ class driverModel {
   }
 
   static getDriverById = (driverId, cb) => {
-    //console.log(driverId);
     const sqlQ = "SELECT driver_id, name, phone, nid_number, vehicle_id FROM drivers WHERE driver_id = ?";
     db.execute(sqlQ, [driverId])
       .then(result => cb(null, result[0]))
@@ -20,6 +19,20 @@ class driverModel {
   static getDriverByPhone = (driverId, cb) => {
     const sqlQ = "SELECT driver_id, name, phone, nid_number, vehicle_id FROM drivers WHERE phone = ?";
     db.execute(sqlQ, [driverId])
+      .then(result => cb(null, result[0]))
+      .catch(err => cb(err, null))
+  }
+
+  static getDriverByNid = (nid, cb) => {
+    const sqlQ = "SELECT driver_id, name, phone, nid_number, vehicle_id FROM drivers WHERE nid_number = ?";
+    db.execute(sqlQ, [nid])
+      .then(result => cb(null, result[0]))
+      .catch(err => cb(err, null))
+  }
+
+  static getDriverByVehicleId = (vehicleId, cb) => {
+    const sqlQ = "SELECT driver_id, name, phone, nid_number, vehicle_id FROM drivers WHERE nid_number = ?";
+    db.execute(sqlQ, [vehicleId])
       .then(result => cb(null, result[0]))
       .catch(err => cb(err, null))
   }

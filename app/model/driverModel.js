@@ -8,7 +8,7 @@ class driverModel {
       .then(result => cb(null, result[0]))
       .catch(err => cb(err, null));
   }
-  
+
   static getDriverById = (driverId, cb) => {
     //console.log(driverId);
     const sqlQ = "SELECT driver_id, name, phone, nid_number, vehicle_id FROM drivers WHERE driver_id = ?";
@@ -26,17 +26,17 @@ class driverModel {
 
   static getTotalOrder = (driverId, cb) => {
     const sqlQ = "SELECT count(*) as totalAssigned FROM orders WHERE (driver_id = ? ) " ;
-    
+
     db.execute(sqlQ, [driverId])
       .then(result => cb(null, result[0]))
       .catch(err => cb(err, null))
   }
-  
+
   static completionRate = (driverId, lastDayBeginning, cb) => {
     //console.log(lastDayBeginning);
-    const sqlQ = 
-      "SELECT status, count(status) AS occurrence FROM (SELECT status FROM orders WHERE (driver_id = ? AND timestamp>= ?) ORDER BY timestamp DESC LIMIT 100 )  as tmpOrders   GROUP BY status" ;
-    
+    const sqlQ =
+      "SELECT status, count(status) AS occurrence FROM (SELECT status FROM orders WHERE (driver_id = ? AND timestamp>= ? AND timestamp<= CURRENT_TIMESTAMP() ) ORDER BY timestamp DESC LIMIT 100 )  as tmpOrders   GROUP BY status" ;
+
     db.execute(sqlQ, [driverId, lastDayBeginning])
       .then(result => cb(null, result[0]))
       .catch(err => cb(err, null))

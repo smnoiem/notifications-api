@@ -6,38 +6,55 @@ const messages = require('../notification/message');
 const router = express.Router();
 
 router.get('/completion-rate/:supply_id', (req, res) => {
-
   const driverId = req.params.supply_id;
-  
-  let lastDay = new Date( Date.now() - 86400000);
-  
-  let lastDayBeginning = lastDay.toISOString().slice(0, 10);
 
-  driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
-    if(err) res.send(err);
-    else if(result.length == 0) res.send('no data found');
-    else{
-      //res.send(result);
-      //return;
-      let completed = 0;
-      let cancelled = 0;
-      for(let data of result){
-        if(data.status == 'COMPLETED') completed = data.occurrence;
-        if(data.status == 'CANCELLED') cancelled = data.occurrence;
+  //validating driver id
+  driverModel.getDriverById( driverId, (err, result) => {
+    if(err) res.send({"Error" : "something happened in db query", "error_code" : err.errno });
+    else {
+      if(result.length) {
+
+        //
+        //fetching driver completion data
+        
+        let lastDay = new Date( Date.now() - 86400000);
+        
+        let lastDayBeginning = lastDay.toISOString().slice(0, 10);
+
+        driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
+          if(err) res.send(err);
+          else if(result.length == 0) res.send('no data found');
+          else{
+            //res.send(result);
+            //return;
+            let completed = 0;
+            let cancelled = 0;
+            for(let data of result){
+              if(data.status == 'COMPLETED') completed = data.occurrence;
+              if(data.status == 'CANCELLED') cancelled = data.occurrence;
+            }
+            console.log('here ', completed, cancelled);
+            let rate = 0.85;
+            if(completed+cancelled >= 100 ) {
+              rate = completed/100.0;
+            }
+            messages.getMessage(rate, (msg) => {
+              res.send({
+                "Completion_rate": rate,
+                "Message": msg
+                });
+            });
+          }
+        })
+        //
+        // driver's ride completion data fetching ends
+
       }
-      console.log('here ', completed, cancelled);
-      let rate = 0.85;
-      if(completed+cancelled >= 100 ) {
-        rate = completed/100.0;
-      }
-      messages.getMessage(rate, (msg) => {
-        res.send({
-          "Completion_rate": rate,
-          "Message": msg
-          });
-      });
+      else res.send({"Error": "Invalid driver id"});
     }
-  } );
+
+  });
+
 
   /*
   let lastDayBeginning = Date.now();
@@ -96,8 +113,18 @@ router.get('/drivers', (req, res) => {
   });
 });
 
-router.get('/drivers/:driverId', (req, res) => {
+router.get('/drivers/by_id/:driverId', (req, res) => {
   driverModel.getDriverById( req.params.driverId, (err, result) => {
+    if(err) res.send({"message" : "driver not found", "error_code" : err.errno });
+    else {
+      if(result.length) res.send(result);
+      else res.send({"Error": "invalid driver id"});
+    }
+  });
+});
+
+router.get('/drivers/by_phone/:driverPhone', (req, res) => {
+  driverModel.getDriverByPhone( req.params.driverPhone, (err, result) => {
     if(err) res.send({"message" : "driver not found", "error_code" : err.errno });
     else {
       if(result.length) res.send(result);

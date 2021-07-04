@@ -15,6 +15,13 @@ class driverModel {
       .then(result => cb(null, result[0]))
       .catch(err => cb(err, null))
   }
+
+  static getDriverByPhone = (driverId, cb) => {
+    const sqlQ = "SELECT driver_id, name, phone, nid_number, vehicle_id FROM drivers WHERE phone = ?";
+    db.execute(sqlQ, [driverId])
+      .then(result => cb(null, result[0]))
+      .catch(err => cb(err, null))
+  }
   
   static completionRate = (driverId, lastDayBeginning, cb) => {
     console.log(lastDayBeginning);

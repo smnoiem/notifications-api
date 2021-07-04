@@ -11,7 +11,6 @@ const getDriverPromise = (driverId) => {
 
     driverModel.getDriverById( driverId, (err, result) => {
       if(err) {
-        //res.send( {"Error" : "something happened in db query111!", "error_code" : err.errno });
         reject({
           "msg": "Something happened in db query",
           "error_code": err.errno
@@ -22,7 +21,6 @@ const getDriverPromise = (driverId) => {
           resolve(result[0]);
         }
         else {
-          //res.send({"Error": "Invalid driver id"});
           reject({
             "Error": "Invalid driver id",
             "error_code": -1
@@ -41,11 +39,9 @@ const getTotalOrderPromise = (driverId) => {
 
     driverModel.getTotalOrder(driverId, (err, result) => {
       if(err) {
-        //res.send({"Error" : "Error fetching total order", "error_code" : err.errno});
         reject(new Error({"Error" : "Error fetching total order", "error_code" : err.errno}) );
       }
       else{
-        //console.log('in gettotal prom: ', result[0].totalAssigned);
         if(result.length > 0 ) resolve(result[0].totalAssigned);
         else resolve(0);
       }
@@ -62,11 +58,9 @@ const getDriverRatingPromise = (driverId, lastDayBeginning) => {
     driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
 
       if(err) {
-        //res.send( {"Error":"something went wrong while fetching completion rate", "error_code": err.errno } );
         reject(new Error( {"Error":"something went wrong while fetching completion rate", "error_code": err.errno }) );
       }
       else{
-        //res.send(result);
         let completed = 0;
         let cancelled = 0;
         if(result.length > 0) {

@@ -11,7 +11,6 @@ const getDriverPromise = (driverId) => {
     
     driverModel.getDriverById( driverId, (err, result) => {
       if(err) {
-        //res.send( {"Error" : "something happened in db query111!", "error_code" : err.errno });
         reject({
           "msg": "Something happened in db query",
           "error_code": err.errno
@@ -22,7 +21,6 @@ const getDriverPromise = (driverId) => {
           resolve(result[0]);
         }
         else {
-          //res.send({"Error": "Invalid driver id"});
           reject({
             "Error": "Invalid driver id",
             "error_code": -1
@@ -41,11 +39,9 @@ const getTotalOrderPromise = (driverId) => {
 
     driverModel.getTotalOrder(driverId, (err, result) => {
       if(err) {
-        //res.send({"Error" : "Error fetching total order", "error_code" : err.errno});
         reject(new Error({"Error" : "Error fetching total order", "error_code" : err.errno}) );
       }
       else{
-        //console.log('in gettotal prom: ', result[0].totalAssigned);
         if(result.length > 0 ) resolve(result[0].totalAssigned);
         else resolve(0);
       }
@@ -62,7 +58,6 @@ const getDriverRatingPromise = (driverId, lastDayBeginning) => {
     driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
 
       if(err) {
-        //res.send( {"Error":"something went wrong while fetching completion rate", "error_code": err.errno } );
         reject(new Error( {"Error":"something went wrong while fetching completion rate", "error_code": err.errno }) );
       }
       else{
@@ -75,8 +70,6 @@ const getDriverRatingPromise = (driverId, lastDayBeginning) => {
             if(data.status == 'CANCELLED') cancelled = data.occurrence;
           }
         }
-
-        //console.log('here ', completed, cancelled);
 
         let divideBy = (completed+cancelled);
 
@@ -99,12 +92,7 @@ const getDriverRatingPromise = (driverId, lastDayBeginning) => {
 
 
 
-
-
-
-
-
-
+// Routes
 
 router.get('/completion-rate/:supply_id', (req, res) => {
 
@@ -118,128 +106,6 @@ router.get('/completion-rate/:supply_id', (req, res) => {
     .then( totalOrderResult => getDriverRatingPromise(driverId, lastDayBeginning) )
     .then( driverRatingResult => res.send(driverRatingResult) )
     .catch( err =>  res.send(err) );
-
-
-
-
-    //
-          //fetching driver completion data
-          
-          /*
-
-
-         
-
-          driverModel.getTotalOrder(driverId, (errInTotal, resultInTotal) => {
-            if(errInTotal) res.send({"Error" : "Error fetching total order", "error_code" : errInTotal.errno});
-            else{
-              const totalOrderAssigned = resultInTotal;
-              //res.send( totalOrderAssigned );
-
-              //
-              // completion rate counting starts
-
-              driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
-                if(err) res.send( {"Error":"something went wrong while fetching completion rate", "error_code": err.errno } );
-                else{
-                  //res.send(result);
-                  //return;
-                  let completed = 0;
-                  let cancelled = 0;
-                  for(let data of result){
-                    if(data.status == 'COMPLETED') completed = data.occurrence;
-                    if(data.status == 'CANCELLED') cancelled = data.occurrence;
-                  }
-                  console.log('here ', completed, cancelled);
-                  let rate = 0.85;
-                  if( totalOrderAssigned >= 100 ) {
-                    rate = completed/100.0;
-                  }
-                  messages.getMessage(rate, (msg) => {
-                    res.send({
-                      "Completion_rate": rate,
-                      "Message": msg
-                      });
-                  });
-                }
-              });
-              //
-              // driver's ride completion data fetching ends
-
-              
-            }
-          });
-
-
-
-  });
-
-
-  driverModel.getDriverById( driverId, (errInGetDriver, resultInGetDriver) => {
-    if(errInGetDriver) {
-      res.send( {"Error" : "something happened in db query111!", "error_code" : errInGetDriver.errno });
-    }
-    else {
-      if(resultInGetDriver.length > 0) {
-
-        //
-        //fetching driver completion data
-        
-        let lastDay = new Date( Date.now() - 86400000);
-        
-        let lastDayBeginning = lastDay.toISOString().slice(0, 10);
-
-        driverModel.getTotalOrder(driverId, (errInTotal, resultInTotal) => {
-          if(errInTotal) res.send({"Error" : "Error fetching total order", "error_code" : errInTotal.errno});
-          else{
-            const totalOrderAssigned = resultInTotal;
-            //res.send( totalOrderAssigned );
-
-            //
-            // completion rate counting starts
-
-            driverModel.completionRate(driverId, lastDayBeginning, (err, result) => {
-              if(err) res.send( {"Error":"something went wrong while fetching completion rate", "error_code": err.errno } );
-              else{
-                //res.send(result);
-                //return;
-                let completed = 0;
-                let cancelled = 0;
-                for(let data of result){
-                  if(data.status == 'COMPLETED') completed = data.occurrence;
-                  if(data.status == 'CANCELLED') cancelled = data.occurrence;
-                }
-                console.log('here ', completed, cancelled);
-                let rate = 0.85;
-                if( totalOrderAssigned >= 100 ) {
-                  rate = completed/100.0;
-                }
-                messages.getMessage(rate, (msg) => {
-                  res.send({
-                    "Completion_rate": rate,
-                    "Message": msg
-                    });
-                });
-              }
-            });
-            //
-            // driver's ride completion data fetching ends
-
-            
-          }
-        });
-
-        
-      }
-      else res.send({"Error": "Invalid driver id"});
-    }
-
-  });
-
-
-});
-
-*/
 });
 
 router.post('/create', (req, res) => {
@@ -248,8 +114,8 @@ router.post('/create', (req, res) => {
     res.send({"message": "Please provide enough user information."});
     return;
   }
+
   const {nid_number, name, phone, vehicle_id} = req.body;
-  const sqlQ = "INSERT INTO drivers VALUES (?,?,?,?) ";
 
   //validation
   if(nid_number && name && phone && vehicle_id){
